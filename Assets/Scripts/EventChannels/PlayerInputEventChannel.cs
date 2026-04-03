@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerLook : MonoBehaviour
+public class PlayerInputEventChannel : ScriptableObject
 {
-    [SerializeField] Camera playerCamera;
+
+        
 }
