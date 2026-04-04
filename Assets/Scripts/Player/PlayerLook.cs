@@ -1,23 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerLook : MonoBehaviour
 {
     [SerializeField] Camera playerCamera;
 
-    private void OnLook()
-    {
-        
-    }
-
     private void Update()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = playerCamera.transform.position.y; // Set the z-axis to the camera's height
+        Vector2 mouseScreenPosition = Mouse.current.position.ReadValue();
+
+        Vector3 mousePosition = new Vector3(mouseScreenPosition.x, mouseScreenPosition.y, playerCamera.transform.position.y);
+
         Vector3 worldMousePosition = playerCamera.ScreenToWorldPoint(mousePosition);
-        worldMousePosition.y = transform.position.y; // Keep the y-axis the same as the player's position
+        worldMousePosition.y = transform.position.y;
+
         Vector3 direction = worldMousePosition - transform.position;
+
         if (direction != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(direction);
@@ -25,3 +25,4 @@ public class PlayerLook : MonoBehaviour
         }
     }
 }
+
