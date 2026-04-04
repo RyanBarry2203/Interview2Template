@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
-  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Player Camera
   m_TagString: MainCamera
@@ -260,20 +259,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &330585548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 330585543}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a7d06fa927b3f34192186256cc60f1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 1927411708}
-  offset: {x: 0, y: 10, z: -5}
 --- !u!1 &358632210
 GameObject:
   m_ObjectHideFlags: 0
@@ -715,7 +700,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c38a76deb58b041a58c80dd71d47e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCamera: {fileID: 330585545}
+  playerCamera: {fileID: 330585546}
+  mouseSensitivity: 50
 --- !u!114 &1927411713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -760,13 +746,13 @@ MonoBehaviour:
     m_ActionName: Game/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1927411706}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 1927411710}
+        m_TargetAssemblyTypeName: PlayerLook, Assembly-CSharp
+        m_MethodName: OnLook
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -808,7 +794,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
