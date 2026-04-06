@@ -467,6 +467,23 @@ public class ButtonData : ScriptableObject
     public float lastInteractionTime = -100f;
 
 }
+using JetBrains.Annotations;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+
+[CreateAssetMenu(fileName ="Door Data", menuName = "Game Data/ Door")]
+public class DoorData : ScriptableObject
+{ 
+
+    [Header("Door Object")]
+    public GameObject doorGameObject;
+
+    [Header("Opening/Closing Speed")]
+    public float openingSpeed = 2f;
+
+}
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -493,6 +510,22 @@ public class InputData : ScriptableObject
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
+[CreateAssetMenu(fileName = "DoorEventChannel", menuName = "ScriptableObjects/EventChannels/DoorEventChannel")]
+public class DoorEventChannel : ScriptableObject
+{
+    public UnityAction doorEvent;
+
+    public void RaiseEvent()
+    {
+        doorEvent?.Invoke();
+
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerInputEventChannel : ScriptableObject
 {
@@ -505,13 +538,8 @@ using UnityEngine;
 
 public interface IInteractible
 {
-    public void Interact()
-    {
-    }
-    public bool CanInteract()
-    {
-            return true;
-    }
+    public void Interact();
+    public bool CanInteract();
 }
 using System.Collections;
 using System.Collections.Generic;
@@ -564,7 +592,6 @@ public class PlayerInteraction : MonoBehaviour
 
         if (context.performed && currentInteractible != null)
         {
-
             IInteractible interactible = currentInteractible.GetComponent<IInteractible>();
             if (interactible != null && interactible.CanInteract() == true)
             {
@@ -643,29 +670,97 @@ using UnityEngine;
 
 public class Button : MonoBehaviour, IInteractible
 {
-    private ButtonData buttonData;
+    //[SerializeField]private ButtonData buttonData;
+
+    //public void Interact()
+    //{
+    //    Debug.Log("Button Pressed");
+    //    Instantiate(buttonData.objectToSpawn, transform.position + Vector3.up * 2, Quaternion.identity);
+
+    //}
+    //public bool CanInteract()
+    //{
+    //    if (Time.time < buttonData.lastInteractionTime + buttonData.cooldownTime)
+    //    {
+    //        Debug.Log("Button is on cooldown");
+    //        return false;
+    //    }
+    //    else
+    //    {
+    //        buttonData.lastInteractionTime = Time.time;
+    //        return true;
+    //    }
+
+
+    //}
+
+    [SerializeField] private DoorEventChannel doorEventChannel;
 
     public void Interact()
     {
         Debug.Log("Button Pressed");
-        Instantiate(buttonData.objectToSpawn, transform.position + Vector3.up * 2, Quaternion.identity);
-
+        doorEventChannel.RaiseEvent();
     }
     public bool CanInteract()
     {
-        if (Time.time < buttonData.lastInteractionTime + buttonData.cooldownTime)
-        {
-            Debug.Log("Button is on cooldown");
-            return false;
-        }
-        else
-        {
-            buttonData.lastInteractionTime = Time.time;
-            return true;
-        }
-
-
+        return true;
     }
+
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+public class Door : MonoBehaviour
+{
+    [SerializeField] private DoorEventChannel doorEventChannel;
+    [SerializeField] private DoorData doorData;
+
+    private enum DoorState { Open, Closed, Opening, Closing }
+    DoorState currentState = DoorState.Closed;
+
+    private float openingSpeed = 2f;
+    private float elapsed = 0f;
+
+    private void Awake()
+    {
+        doorEventChannel.doorEvent += ToggleDoor;
+    }
+    private void ToggleDoor()
+    {
+        if (currentState == DoorState.Closed || currentState == DoorState.Closing)
+        {
+            OpenDoorAsync();
+        }
+        else if (currentState == DoorState.Open || currentState == DoorState.Opening)
+        {
+            CloseDoorAsync();
+        }
+    }
+
+    private async void OpenDoorAsync()
+    {
+        while (elapsed! >= openingSpeed)
+        {
+            doorData.doorGameObject.transform.Rotate(Vector3.up, 90f * Time.deltaTime);
+            elapsed += Time.deltaTime;
+            await System.Threading.Tasks.Task.Yield();
+        }
+    }
+    private async void CloseDoorAsync()
+    {
+        while (elapsed! >= openingSpeed)
+        {
+            doorData.doorGameObject.transform.Rotate(Vector3.up, -90f * Time.deltaTime);
+            elapsed += Time.deltaTime;
+            await System.Threading.Tasks.Task.Yield();
+        }
+    }
+
+
+
 }
 using System;
 using UnityEngine;

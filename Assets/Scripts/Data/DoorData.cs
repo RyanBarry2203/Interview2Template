@@ -8,9 +8,6 @@ using UnityEngine;
 public class DoorData : ScriptableObject
 { 
 
-    [Header("Door Object")]
-    public GameObject doorGameObject;
-
     [Header("Opening/Closing Speed")]
     public float openingSpeed = 2f;
 

@@ -974,6 +974,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doorEventChannel: {fileID: 11400000, guid: 30034ed1ad7b5f5488fab45ebb18c442, type: 2}
   doorData: {fileID: 11400000, guid: e77c58e9c5fbb95469bd2700aa969a31, type: 2}
+  doorGameObject: {fileID: 2121917812}
 --- !u!65 &2121917814
 BoxCollider:
   m_ObjectHideFlags: 0
