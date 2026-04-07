@@ -8,6 +8,7 @@ public class PlayerInteraction : MonoBehaviour
     private RaycastHit hit;
     private GameObject currentInteractible;
     private GameObject previousInteractible;
+
     private void CastRay()
     {
         if (Physics.Raycast(transform.position, transform.forward, out hit, 3f, LayerMask.GetMask("Interactible")))
