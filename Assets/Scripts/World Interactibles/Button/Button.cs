@@ -30,12 +30,12 @@ public class Button : MonoBehaviour, IInteractible
 
     [SerializeField] private DoorEventChannel doorEventChannel;
 
-    public void Interact()
+    public void Interact(GameObject interactor)
     {
         Debug.Log("Button Pressed");
         doorEventChannel.RaiseEvent();
     }
-    public bool CanInteract()
+    public bool CanInteract(GameObject interactor)
     {
         return true;
     }

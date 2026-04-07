@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    private List<GameObject> inventory = new List<GameObject>();
+    private List<ItemData> inventory = new List<ItemData>();
 
     [SerializeField] private InventoryEventChannel inventoryEventChannel;
 
-    public void AddToInventory(GameObject item)
+    public void AddToInventory(ItemData item)
     {
             inventory.Add(item);
             Debug.Log("Added " + item.name + " to inventory.");

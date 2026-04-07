@@ -33,10 +33,10 @@ public class PlayerInteraction : MonoBehaviour
         if (context.performed && currentInteractible != null)
         {
             IInteractible interactible = currentInteractible.GetComponent<IInteractible>();
-            if (interactible != null && interactible.CanInteract() == true)
+            if (interactible != null && interactible.CanInteract(this.gameObject) == true)
             {
                 Debug.Log("Interacted with " + currentInteractible.name);
-                interactible.Interact();
+                interactible.Interact(this.gameObject);
             }
         }
     }

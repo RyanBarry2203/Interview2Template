@@ -9,24 +9,20 @@ public class Item : MonoBehaviour, IInteractible
 
     private PlayerInventory playerInventory;
 
-    private void Start()
-    {
-        playerInventory = GetComponent<PlayerInventory>();
-    }
-    public bool CanInteract()
+    public bool CanInteract(GameObject interactor)
     {
         return true;
     }
 
-    public void Interact()
+    public void Interact(GameObject interactor)
     {
         Debug.Log("Interacted with " + itemData.itemName);
-        AddItemToInventory(itemGameObject);
+        AddItemToInventory(itemData, interactor);
 
     }
-    private void AddItemToInventory(GameObject item)
+    private void AddItemToInventory(ItemData item, GameObject interactor)
     {
-        playerInventory.AddToInventory(item);
+        interactor.GetComponent<PlayerInventory>().AddToInventory(item);
         Destroy(itemGameObject);
 
     }

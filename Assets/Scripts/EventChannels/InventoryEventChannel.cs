@@ -7,9 +7,9 @@ using UnityEngine.Events;
 public class InventoryEventChannel : ScriptableObject
 {
 
-    public UnityAction <GameObject> OnItemAdded;
+    public UnityAction <ItemData> OnItemAdded;
 
-    public void RaiseEvent(GameObject item)
+    public void RaiseEvent(ItemData item)
     {
         OnItemAdded?.Invoke(item);
     }

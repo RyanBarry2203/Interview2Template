@@ -1,0 +1,453 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraFollow : MonoBehaviour
+{
+    public Transform player;
+    public Vector3 offset = new Vector3(0, 10, -5);
+
+    private void LateUpdate()
+    {
+        if (player != null)
+        {
+            transform.position = player.position + offset;
+        }
+    }
+}
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+[CreateAssetMenu(fileName = "DefaultButtondata", menuName = "Game Data/ Button")]
+public class ButtonData : ScriptableObject
+{
+    [Header("Object to Spawn")]
+    public GameObject objectToSpawn;
+
+    [Header("Cooldown Data")]
+    public float cooldownTime = 3f;
+    public float lastInteractionTime = -100f;
+
+}
+using JetBrains.Annotations;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+
+[CreateAssetMenu(fileName ="Door Data", menuName = "Game Data/ Door")]
+public class DoorData : ScriptableObject
+{ 
+
+    [Header("Opening/Closing Speed")]
+    public float openingSpeed = 2f;
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InputData : ScriptableObject
+{
+    private static InputData _instance;
+    private static Dictionary<string, InputData> inputDictionary;
+
+    //public static InputData Instance;
+    //{
+    //    get
+    //    {
+    //        if (_instance == null)
+    //        {
+    //            _instance = Resources.Load<InputData>("InputData");
+    //        }
+    //        return _instance;
+    //    }
+    //}
+
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "Item Data", menuName = "Game Data/ Item Data")]
+public class ItemData : ScriptableObject
+{
+    [Header("Item Info")]
+    public string itemName;
+    public string description;
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
+
+[CreateAssetMenu(fileName = "DoorEventChannel", menuName = "ScriptableObjects/EventChannels/DoorEventChannel")]
+public class DoorEventChannel : ScriptableObject
+{
+    public UnityAction doorEvent;
+
+    public void RaiseEvent()
+    {
+        doorEvent?.Invoke();
+
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
+
+[CreateAssetMenu(fileName = "Item Data", menuName = "ScriptableObjects/ EventChannels/InventoryEventChannel")]
+public class InventoryEventChannel : ScriptableObject
+{
+
+    public UnityAction <GameObject> OnItemAdded;
+
+    public void RaiseEvent(GameObject item)
+    {
+        OnItemAdded?.Invoke(item);
+    }
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerInputEventChannel : ScriptableObject
+{
+
+        
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public interface IInteractible
+{
+    public void Interact();
+    public bool CanInteract();
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InventoryUI : MonoBehaviour
+{
+    [SerializeField]private InventoryEventChannel inventoryEventChannel;
+    private List <GameObject> inventoryToDraw = new List<GameObject>();
+
+    private void OnEnable()
+    {
+        inventoryEventChannel.OnItemAdded += AddItemToInventory;
+    }
+    private void OnDisable()
+    {
+        inventoryEventChannel.OnItemAdded -= AddItemToInventory;
+    }
+    private void AddItemToInventory(GameObject item)
+    {
+        inventoryToDraw.Add(item);
+    }
+    private void OnGUI()
+    {
+        for (int i = 0; i < inventoryToDraw.Count; i++)
+        {
+
+            var itemDataComponent = inventoryToDraw[i].GetComponent<ItemData>();
+
+            string itemName = itemDataComponent != null ? itemDataComponent.itemName : "Unknown Item";
+            GUI.Label(new Rect(10, 10 + (i * 20), 200, 20), itemName);
+        }
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerInput : MonoBehaviour
+{
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerInteraction : MonoBehaviour
+{
+    private RaycastHit hit;
+    private GameObject currentInteractible;
+    private GameObject previousInteractible;
+
+    private void CastRay()
+    {
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 3f, LayerMask.GetMask("Interactible")))
+        {
+            currentInteractible = hit.collider.gameObject;
+            if (currentInteractible != previousInteractible)
+            {
+                Debug.Log("Can Interact with " + currentInteractible.name);
+                previousInteractible = currentInteractible;
+            }
+        }
+        else
+        {
+            currentInteractible = null;
+            previousInteractible = null;
+        }
+    }
+    public void OnInteract(InputAction.CallbackContext context)
+    {
+        CastRay();
+
+        if (context.performed && currentInteractible != null)
+        {
+            IInteractible interactible = currentInteractible.GetComponent<IInteractible>();
+            if (interactible != null && interactible.CanInteract() == true)
+            {
+                Debug.Log("Interacted with " + currentInteractible.name);
+                interactible.Interact();
+            }
+        }
+    }
+}
+
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerInventory : MonoBehaviour
+{
+    private List<GameObject> inventory = new List<GameObject>();
+
+    [SerializeField] private InventoryEventChannel inventoryEventChannel;
+
+    public void AddToInventory(GameObject item)
+    {
+            inventory.Add(item);
+            Debug.Log("Added " + item.name + " to inventory.");
+
+            inventoryEventChannel.RaiseEvent(item);
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerLook : MonoBehaviour
+{
+    public Transform playerCamera;
+    public float mouseSensitivity = 50f;
+
+    private Vector2 lookInput;
+    private float xRotation = 0f;
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        lookInput = context.ReadValue<Vector2>();
+    }
+    private void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+    private void Update()
+    {
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+
+        playerCamera.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        transform.Rotate(Vector3.up * mouseX);
+    }
+}
+
+
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerMovement : MonoBehaviour
+{
+    [SerializeField]public float speed = 5f;
+
+    private Vector2 moveInput;
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+    private void Update()
+    {
+        Vector3 movement = new Vector3(moveInput.x, 0, moveInput.y);
+
+        transform.Translate(movement * speed * Time.deltaTime);
+    }
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Button : MonoBehaviour, IInteractible
+{
+    //[SerializeField]private ButtonData buttonData;
+
+    //public void Interact()
+    //{
+    //    Debug.Log("Button Pressed");
+    //    Instantiate(buttonData.objectToSpawn, transform.position + Vector3.up * 2, Quaternion.identity);
+
+    //}
+    //public bool CanInteract()
+    //{
+    //    if (Time.time < buttonData.lastInteractionTime + buttonData.cooldownTime)
+    //    {
+    //        Debug.Log("Button is on cooldown");
+    //        return false;
+    //    }
+    //    else
+    //    {
+    //        buttonData.lastInteractionTime = Time.time;
+    //        return true;
+    //    }
+
+
+    //}
+
+    [SerializeField] private DoorEventChannel doorEventChannel;
+
+    public void Interact()
+    {
+        Debug.Log("Button Pressed");
+        doorEventChannel.RaiseEvent();
+    }
+    public bool CanInteract()
+    {
+        return true;
+    }
+
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+public class Door : MonoBehaviour
+{
+    [SerializeField] private DoorEventChannel doorEventChannel;
+    [SerializeField] private DoorData doorData;
+
+    public GameObject doorGameObject;
+
+    private enum DoorState { Open, Closed, Opening, Closing }
+    DoorState currentState = DoorState.Closed;
+
+    private float openingSpeed = 2f;
+    private float elapsed = 0f;
+
+    private void OnEnable()
+    {
+        doorEventChannel.doorEvent += ToggleDoor;
+    }
+    private void OnDisable()
+    {
+        doorEventChannel.doorEvent -= ToggleDoor;
+    }
+    private void ToggleDoor()
+    {
+        if (currentState == DoorState.Closed || currentState == DoorState.Closing)
+        {
+            currentState = DoorState.Opening;
+            OpenDoorAsync();
+        }
+        else if (currentState == DoorState.Open || currentState == DoorState.Opening)
+        {
+            currentState = DoorState.Closing;
+            CloseDoorAsync();
+        }
+    }
+
+    private async void OpenDoorAsync()
+    {
+        while (elapsed <= openingSpeed)
+        {
+            doorGameObject.transform.Rotate(Vector3.up, 90f * Time.deltaTime);
+            elapsed += Time.deltaTime;
+            await System.Threading.Tasks.Task.Yield();
+        }
+        currentState = DoorState.Open;
+        elapsed = 0f;
+    }
+    private async void CloseDoorAsync()
+    {
+        while (elapsed <= openingSpeed)
+        {
+            doorGameObject.transform.Rotate(Vector3.up, -90f * Time.deltaTime);
+            elapsed += Time.deltaTime;
+            await System.Threading.Tasks.Task.Yield();
+        }
+        currentState = DoorState.Closed;
+        elapsed = 0f;
+    }
+
+
+
+}
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Item : MonoBehaviour, IInteractible
+{
+    [SerializeField] private ItemData itemData;
+    [SerializeField] private GameObject itemGameObject;
+
+    private PlayerInventory playerInventory;
+
+    private void Start()
+    {
+        playerInventory = GetComponent<PlayerInventory>();
+    }
+    public bool CanInteract()
+    {
+        return true;
+    }
+
+    public void Interact()
+    {
+        Debug.Log("Interacted with " + itemData.itemName);
+        AddItemToInventory(itemGameObject);
+
+    }
+    private void AddItemToInventory(GameObject item)
+    {
+        playerInventory.AddToInventory(item);
+        Destroy(itemGameObject);
+
+    }
+} 
