@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    private RaycastHit hit;
+    public RaycastHit hit;
     private GameObject currentInteractible;
     private GameObject previousInteractible;
 
