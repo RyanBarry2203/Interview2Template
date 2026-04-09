@@ -33,4 +33,9 @@ public class TelekineticObject : MonoBehaviour, IInteractible
         myRigidbody.useGravity = true;
         myRigidbody.mass = 1f;
     }
+
+    public void StopInteract(GameObject interactor)
+    {
+        throw new System.NotImplementedException();
+    }
 }

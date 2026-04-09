@@ -20,6 +20,12 @@ public class Item : MonoBehaviour, IInteractible
         AddItemToInventory(itemData, interactor);
 
     }
+
+    public void StopInteract(GameObject interactor)
+    {
+        throw new System.NotImplementedException();
+    }
+
     private void AddItemToInventory(ItemData item, GameObject interactor)
     {
         interactor.GetComponent<PlayerInventory>().AddToInventory(item);

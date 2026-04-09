@@ -39,7 +39,17 @@ public class PlayerInteraction : MonoBehaviour
                 interactible.Interact(this.gameObject);
             }
         }
+        if (context.canceled && currentInteractible != null)
+        {
+            IInteractible interactible = currentInteractible.GetComponent<IInteractible>();
+            if (interactible != null)
+            {
+                Debug.Log("Stopped Interacting with " + currentInteractible.name);
+                interactible.StopInteract(this.gameObject);
+            }
+        }
     }
+
 }
 
 

@@ -40,5 +40,8 @@ public class Button : MonoBehaviour, IInteractible
         return true;
     }
 
-
+    public void StopInteract(GameObject interactor)
+    {
+        throw new System.NotImplementedException();
+    }
 }
